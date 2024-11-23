@@ -7,196 +7,129 @@ const { RateLimiter } = require('limiter');
 
 const PORT = process.env.PORT ?? 3000
 
-let selectedCity = '';
-
 const welcomeFlow = addKeyword(EVENTS.WELCOME)
     .addAnswer([
-        '¡Bienvenido!, te comunicas con el *Bot* 🤖  automático de la Cooperativa Crediscol ¿En qué trámite puedo ayudarte?',
-        'Escribe *1* para obtener información sobre *afiliaciones*.',
-        'Escribe *2* para obtener información sobre *solicitudes de créditos*.',
-        'Escribe *3* para obtener información sobre *devoluciones de aportes*.',
-        'Escribe *4* para obtener información sobre *estados de cuenta*.',
-        'Escribe *5* para obtener información sobre *desafiliaciones*.',
-        'Escribe *6* para obtener información sobre *trámites por fallecimiento*.',
-        'Escribe *7* para obtener información sobre *auxilios*.',
-        'Escribe *8* para obtener información sobre *paz y salvo*.',
-        'Escribe *9* para obtener información sobre *otros servicios*.',
-    ])
+        '¡Bienvenido! Te comunicas con el *Bot Automático* 🤖 de la Cooperativa Crediscol. ¿En qué trámite puedo ayudarte?',
+        'Por favor escriba un número de acuerdo a su solicitud',
+        '1️⃣ Afiliaciones.',
+        '2️⃣ Solicitudes de créditos.',
+        '3️⃣ Devoluciones de aportes.',
+        '4️⃣ Estados de cuenta.',
+        '5️⃣ Desafiliaciones.',
+        '6️⃣ Trámites por fallecimiento.',
+        '7️⃣ Auxilios.',
+        '8️⃣ Paz y salvo.',
+        '9️⃣ Otros servicios.',
+    ]);
 
-const planesFlow = addKeyword(['1'])
+const afiliacionesFlow = addKeyword(['1']).addAnswer([
+    '🔹 *Requisitos para solicitar una afiliación*:',
+    '1. Copia de Cédula ampliada al 150%.',
+    '2. Últimos 3 desprendibles de nómina.',
+    '3. Resolución o certificado de pensión.',
+    '4. Recibo de Servicio Público (agua o luz).',
+]);
+
+const creditosFlow = addKeyword(['2']).addAnswer([
+    '🔹 *Requisitos para solicitar un crédito*:',
+    '1. Copia de Cédula ampliada al 150%.',
+    '2. Últimos 3 desprendibles de nómina.',
+    '3. Recibo de Servicio Público (agua o luz).',
+]);
+
+const aportesFlow = addKeyword(['3']).addAnswer([
+    '🔹 *Requisitos para solicitar la devolución de aportes*:',
+    '1. Estar a paz y salvo por todo concepto.',
+    '2. Radicar carta escrita solicitando la devolución de aportes.',
+]);
+
+const estadoFlow = addKeyword(['4']).addAnswer([
+    '🔹 *Requisitos para solicitar el estado de cuenta*:',
+    '1. Consignar $15.000 pesos en nuestras cuentas de recaudo e ingresar a www.crediscol.com en la opción PAGOS EN LÍNEA.',
+    '2. Radicar carta indicando el motivo de la solicitud, incluyendo dirección de correo electrónico y número de cédula.',
+]);
+
+const desafiliacionesFlow = addKeyword(['5']).addAnswer([
+    '🔹 *Requisitos para solicitar una desafiliación*:',
+    '1. Estar a paz y salvo por todo concepto.',
+    '2. Radicar carta escrita solicitando el retiro de la Cooperativa.',
+]);
+
+const fallecidoFlow = addKeyword(['6']).addAnswer([
+    '🔹 *Requisitos para trámites por fallecimiento*:',
+    '1. Registro Civil de Defunción (original o copia autenticada).',
+    '2. Carta solicitando la devolución de aportes.',
+    '3. Carta solicitando auxilio por fallecimiento.',
+    '4. Fotocopia de la Cédula del asociado fallecido y del beneficiario.',
+    '5. Si es cónyuge: copia del Registro de Matrimonio.',
+    '6. Si son hijos: copia del Registro de Nacimiento.',
+]);
+
+const seleccionAuxFlow = addKeyword(['7'])
     .addAnswer([
-        '¿Dónde te encuentras?',
-        'Escribe *Bogotá* o *Calarcá* para ver las ubicaciones en las que Redetek tiene cobertura.'
-    ])
+        '🔹 *Tipos de auxilios disponibles*:',
+        'Escriba *hospitalizacion*: Para auxilio por hospitalización.',
+        'Escriba *fallecimiento*: Para auxilio por fallecimiento.',
+        'Escriba *calamidad*: Para auxilio por calamidad doméstica.',
+        'Escriba *familiar*: Para auxilio por fallecimiento de familiar.',
+    ]);
 
-const bogotaFlow = addKeyword(['Bogotá', 'Bogota', 'bogota', 'bogotá'])
-    .addAnswer('Estos son los barrios en los que tenemos cobertura para *Bogotá*:', null, (ctx) => {
-        selectedCity = 'Bogotá';
-    })
-    .addAnswer([
-        'ACAPULCO', 'ALCAZARES', 'BELLAVISTA', 'BONANZA', 'BOYACA', 'BOYACÁ',
-        'BOSQUE POPULAR', 'CLARITA', 'CONSOLACION', 'CONSOLACIÓN', 'DORADO NORTE',
-        'EL PASEO', 'ENCANTO', 'ESTRADA', 'ESTRADITA', 'EUROPA',
-        'GAITAN', 'GAITÁN', 'ISABELLA', 'JUAN XXIII', 'LA AURORA', 'LA CABAÑA',
-        'LA LIBERTAD', 'LA RELIQUIA', 'LAS FERIAS', 'LAUREL', 'LUJAN',
-        'ONCE DE NOVIEMBRE', 'PALO BLANCO', 'REAL', 'SAN FERNANDO',
-        'SANTA HELENITA', 'SANTA MARIA DEL LAGO', 'SANTA SOFIA', 'SANTA SOFÍA',
-        'SIMON BOLIVAR', 'SIMÓN BOLIVAR', 'SOLEDAD NORTE', 'STA ISABEL', 'TABORA',
-        'VILLA LUZ', 'FRAGUITA', 'BALVANERA', 'EDUARDO SANTOS',
-        'FRAGUA', 'POLICARPA', 'PROGRESO-BOYACA', 'PROGRESO', 'PROGRESO-BOYACÁ', 'RESTREPO',
-        'SAN ANTONIO', 'SEVILLA', 'VERGEL', 'VOTO NACIONAL', 'SOLEDAD NORTE PARWEY',
-        '\nPor favor, escribe el nombre de tu barrio.'
-    ])
+const hospitalizacionFlow = addKeyword(['hospitalización', 'hospitalizacion']).addAnswer([
+    '🔹 *Requisitos para auxilio por hospitalización*:',
+    '1. Tener crédito vigente.',
+    '2. La hospitalización debe ser mayor a 3 días.',
+    '3. Carta solicitando auxilio.',
+    '4. Certificación de ingreso y egreso del hospital.',
+    '5. No debe superar los 60 días desde el evento.',
+]);
 
-const calarcaFlow = addKeyword(['Calarca', 'calarca', 'Calarcá', 'calarcá'])
-    .addAnswer('Estos son los barrios en los que tenemos cobertura para *Calarcá*:', null, (ctx) => {
-        selectedCity = 'Calarcá';
-    })
-    .addAnswer([
-        'ANTONIA SANTOS', 'ANTONIO NARIÑO', 'AVENIDA COLON', 'AVENIDA COLÓN', 'BALCONES DE LA VILLA',
-        'BALCONES VIEJO', 'BOSQUES DE LA BELLA', 'BUENA VISTA', 'CAFETEROS',
-        'CALDAS', 'CENTRO', 'CRISTO REY', 'DIVINO NIÑO', 'ECOMAR', 'EL BOSQUE',
-        'GAITAN', 'GUADUALES', 'HUERTA', 'JARDIN', 'JARDÍN', 'LA BELLA', 'LA FLORESTA',
-        'LA GRAN VIA', 'LA GRAN VÍA', 'LA ISLA', 'LA PISTA', 'LA PLAYITA', 'LAS AGUAS',
-        'LAS PALMAS', 'MANANTIAL', 'MIRADOR DE GUADUALES', 'MONTECARLO',
-        'NARANJAL', 'OSCAR TOBON', 'OSCAR TOBÓN', 'PINAR', 'PLAZUELAS DE LA VILLA',
-        'PORTAL DE BALCONES', 'PORVENIR', 'PRADERA ALTA', 'PRIMAVERA',
-        'RECUERDO', 'SANTA LUISA DE', 'FINCA LA ESPERANZA', 'ASOMECA',
-        'CAMELIAS 2', 'FERIAS', 'LAURELES', 'LUIS CARLOS GALAN', 'LUIS CARLOS GALÁN',
-        'MARIANO OSPINA', 'MILCIADES SEGURA', 'POPULAR', 'SAN BERNANDO', 'SIMON BOLIVAR',
-        'SIMÓN BOLIVAR', 'TERRAQUIMBAYA', 'TERRAZAS DE BUENA VISTA',
-        'VALDEPENA', 'VARSOVIA', 'VERACRUZ', 'VILLA ASTRID CAROLINA',
-        'VILLA GRANDE', 'VILLA ITALIA', 'VILLA JAZMIN', 'VILLA JAZMÍN','VILLA TATIANA',
-        'VILLAS DEL CAFE', 'VILLAS DEL CAFÉ', 'VIRGINIA', 'PRADERA BAJA',
-        '\nPor favor, escribe el nombre de tu barrio.'
-    ])
+const fallecimientoFlow = addKeyword(['fallecimiento']).addAnswer([
+    '🔹 *Requisitos para auxilio por fallecimiento*:',
+    '1. Registro Civil de Defunción.',
+    '2. Copia de Cédula del beneficiario.',
+    '3. Carta solicitando el auxilio.',
+]);
 
-const barriosEspecialesBogotaFlow = addKeyword(['voto nacional', 'soledad norte parwey'])
-    .addAnswer([
-        'Estos son los planes disponibles para ti:',
-        '100 MEGAS por $92.000',
-        '300 MEGAS PLUS BANDA ANCHA por $112.000',
-        '500 MEGAS PLUS por $159.000',
-        '\nSi estás interesado en alguno de los planes, escribe *contratar*',
-        'Si deseas ver las condiciones del servicio, escribe *condiciones*'
-    ])
+const calamidadFlow = addKeyword(['calamidad']).addAnswer([
+    '🔹 *Requisitos para auxilio por calamidad doméstica*:',
+    '1. Carta solicitando el auxilio.',
+    '2. Certificación de la JAC o entidad que atendió la calamidad.',
+    '3. Cotización del material para resarcir los daños.',
+]);
 
-const barriosEspecialesCalarca = addKeyword(['virginia', 'mariano ospina', 'cafeteros', 'divino niño', 'ferias', 'antonio nariño', 'pradera baja', 'cristo rey'])
-    .addAnswer([
-        'Estos son los planes disponibles para ti:',
-        '50 MEGAS por $40.000',
-        '100 MEGAS por $50.000',
-        '150 MEGAS por $60.000',
-        '\nSi estás interesado en alguno de los planes, escribe *contratar*',
-        'Si deseas ver las condiciones del servicio, escribe *condiciones*'
-    ])
+const fallecimientoFamiliarFlow = addKeyword(['familiar']).addAnswer([
+    '🔹 *Requisitos para auxilio por fallecimiento de familiar*:',
+    '1. Carta solicitando el auxilio.',
+    '2. Registro Civil de Defunción original o copia autenticada.',
+    '3. Registro Civil del beneficiario que certifique el parentesco.',
+]);
 
-const barriosBogota = addKeyword(['ACAPULCO', 'ALCAZARES', 'BELLAVISTA', 'BONANZA', 'BOYACA', 'BOYACÁ',
-    'BOSQUE POPULAR', 'CLARITA', 'CONSOLACION', 'CONSOLACIÓN', 'DORADO NORTE',
-    'EL PASEO', 'ENCANTO', 'ESTRADA', 'ESTRADITA', 'EUROPA',
-    'GAITAN', 'GAITÁN', 'ISABELLA', 'JUAN XXIII', 'LA AURORA', 'LA CABAÑA',
-    'LA LIBERTAD', 'LA RELIQUIA', 'LAS FERIAS', 'LAUREL', 'LUJAN',
-    'ONCE DE NOVIEMBRE', 'PALO BLANCO', 'REAL', 'SAN FERNANDO',
-    'SANTA HELENITA', 'SANTA MARIA DEL LAGO', 'SANTA SOFIA', 'SANTA SOFÍA',
-    'SIMON BOLIVAR', 'SIMÓN BOLIVAR', 'SOLEDAD NORTE', 'STA ISABEL', 'TABORA',
-    'VILLA LUZ', 'FRAGUITA', 'BALVANERA', 'EDUARDO SANTOS',
-    'FRAGUA', 'POLICARPA', 'PROGRESO-BOYACA', 'PROGRESO', 'PROGRESO-BOYACÁ', 'RESTREPO',
-    'SAN ANTONIO', 'SEVILLA', 'VERGEL'])
-    .addAnswer('Si eres persona natural, escribe *natural* y si eres persona juridica escribe *juridica*')
+const pazYSalvoFlow = addKeyword(['8']).addAnswer([
+    '🔹 *Requisitos para solicitar Paz y Salvo*:',
+    '1. Estar al día con las obligaciones crediticias y de aportes.',
+    '2. Radicar carta de solicitud al correo jefecredito@crediscol.com.',
+]);
 
-const barriosCalarca = addKeyword(['ANTONIA SANTOS', 'AVENIDA COLON', 'AVENIDA COLÓN', 'BALCONES DE LA VILLA',
-    'BALCONES VIEJO', 'BOSQUES DE LA BELLA', 'BUENA VISTA',
-    'CALDAS', 'CENTRO', 'ECOMAR', 'EL BOSQUE', 'GAITAN', 'GAITÁN', 'GUADUALES', 'HUERTA', 'JARDIN', 'JARDÍN', 'LA BELLA', 'LA FLORESTA',
-    'LA GRAN VIA', 'LA GRAN VÍA', 'LA ISLA', 'LA PISTA', 'LA PLAYITA', 'LAS AGUAS',
-    'LAS PALMAS', 'MANANTIAL', 'MIRADOR DE GUADUALES', 'MONTECARLO',
-    'NARANJAL', 'OSCAR TOBON', 'PINAR', 'PLAZUELAS DE LA VILLA',
-    'PORTAL DE BALCONES', 'PORVENIR', 'PRADERA ALTA', 'PRIMAVERA',
-    'RECUERDO', 'SANTA LUISA DE', 'FINCA LA ESPERANZA', 'ASOMECA',
-    'CAMELIAS 2', 'LAURELES', 'LUIS CARLOS GALAN', 'LUIS CARLOS GALÁN', 'MILCIADES SEGURA', 'POPULAR', 'SAN BERNANDO',
-    'SIMÓN BOLIVAR', 'SIMON BOLIVAR', 'TERRAQUIMBAYA', 'TERRAZAS DE BUENA VISTA',
-    'VALDEPENA', 'VARSOVIA', 'VERACRUZ', 'VILLA ASTRID CAROLINA',
-    'VILLA GRANDE', 'VILLA ITALIA', 'VILLA JAZMIN', 'VILLA JAZMÍN', 'VILLA TATIANA',
-    'VILLAS DEL CAFE', 'VILLAS DEL CAFÉ'])
-    .addAnswer([
-        'Estos son los planes disponibles para ti:',
-        '10 MEGAS por $40.000',
-        '15 MEGAS por $50.000',
-        '30 MEGAS por $60.000',
-        '\nSi estás interesado en alguno de los planes, escribe *contratar*',
-        'Si deseas ver las condiciones del servicio, escribe *condiciones*'
-    ])
-
-const personaNaturalBogotaFlow = addKeyword(['natural', 'Natural'])
-    .addAnswer([
-        'Si eres *Persona Natural* en Bogotá, estos son los planes disponibles para ti:',
-        'TV e Internet Fibra Optica 200 Megas por $65.000',
-        'TV e Internet 300 Megas por $75.000',
-        'TV e Internet 400 Megas por $85.000',
-        'TV e Internet 500 Megas por $95.000',
-        '\nSi estás interesado en alguno de los planes, escribe *contratar*',
-        'Si deseas ver las condiciones del servicio, escribe *condiciones*'
-    ])
-
-const personaJuridicaBogotaFlow = addKeyword(['jurídica', 'juridica', 'Jurídica', 'Juridica'])
-    .addAnswer([
-        'Si eres *Persona Jurídica* en Bogotá estos son los planes disponibles para ti:',
-        '100 MEGAS por $92.000',
-        '300 MEGAS PLUS BANDA ANCHA por $112.000',
-        '500 MEGAS PLUS por $159.000',
-        '\nSi estás interesado en alguno de los planes, escribe *contratar*',
-        'Si deseas ver las condiciones del servicio, escribe *condiciones*'
-    ])
-
-const oficinasFlow = addKeyword(['Oficinas', 'oficinas'])
-    .addAnswer([
-        'Estas son nuestras oficinas en *Bogotá*:',
-        'San fernando Cra 58# 73-12',
-        'La Estrada Cll 66 #69p 39',
-        'Boyacá Real Cll 69a # 74a 21',
-        'Fraguita  Cra 24 #7 - 49sur',
-        '\nY esta es nuestra oficina en *Calarcá*:',
-        'Av colon # 26-33'
-    ])
-
-const contratarFlow = addKeyword(['contratar', 'Contratar'])
-    .addAnswer([
-        'Debes acercarte a la oficina más cercana con una copia de tu cedula y una de un recibo público donde se evidencie la dirección exacta a instalar para la validación del costo de instalación, el cual puede costar entre $0 a $90.000 pesos',
-        'Si deseas ver la dirección de la oficina más cercana a ti, escribe *oficinas*',
-        'Si deseas ver las condiciones del servicio, escribe *condiciones*'
-    ])
-
-const condicionesFlow = addKeyword(['Condiciones', 'condiciones'])
-    .addAnswer([
-        'Todos los planes cuentan con clausula de permanencia de 1 (un) año.',
-        'Se firma contrato a comodato frente al modem, el cual deben reintegran al finalizar el contrato.',
-        'La TV en señal analoga (TVs basicos que no cuentan con la TDT) sintoniza actualmente 54 canales y en señal digital (TVs que cuentan con la TDT incorporada) más de 130 canales.',
-        'El servicio de solo TV tiene un costo de 38.000 y contiene los mismos canales con cableado completamente nuevo, si en la vivienda existe una cometida ya montada en estado útil se brinda la señal por ese mismo medio de hasta 4 TVs por el mismo costo; Si este cableado no es útil debe cancelar derivaciones por punto con un costo de 20.000, son permitidos máximo 4 TVs por esa tarifa, si supera esa cantidad se evalua una tarifa especial según los TVs que maneje en la vivienda.',
-        'El servicio de instalación se establece entre 1 a 6 días hábiles como máximo.'
-    ])
-
-const soporteFlow = addKeyword(['Soporte', 'soporte'])
-    .addAnswer('Para soporte técnico debes comunicarte a la siguiente línea telefónica para *Bogotá*: 6013080010 y para *Calarcá*: 6013080012. Allí tu solicitud será validada en un lapso no mayor a 24 horas hábiles laboradas.')
-
-const retiroFlow = addKeyword(['Retiro', 'retiro'])
-    .addAnswer('Para realizar un retiro debe estar al día en pagos (clausula,equipos,mensualidades). Debe entregar el micronodo junto al cargador o el modem junto al cargador *segun los equipos que maneje en la vividenda*. Además debe presentar una carta de retiro junto a la  copia de la cedula del titular. Si la persona que se presenta es un tercero, debe tener también una carta autorizando el retiro al tercero junto a la copia de la cedula del titular y la de quien presenta la solicitud; Todo esto antes del día 1 del mes que no desea que le facturen.')
+const otrosFlow = addKeyword(['9']).addAnswer([
+    'Para otros servicios, por favor comunícate con nuestra línea de atención al cliente: (601) 3297199.',
+]);
 
 const main = async () => {
     const adapterFlow = createFlow([
-        welcomeFlow, 
-        planesFlow, 
-        soporteFlow, 
-        condicionesFlow, 
-        contratarFlow, 
-        oficinasFlow, 
-        personaJuridicaBogotaFlow, 
-        personaNaturalBogotaFlow, 
-        barriosBogota, 
-        barriosCalarca, 
-        barriosEspecialesBogotaFlow, 
-        barriosEspecialesCalarca, 
-        calarcaFlow, 
-        bogotaFlow, 
-        retiroFlow
+        welcomeFlow,
+        afiliacionesFlow, 
+        creditosFlow, 
+        aportesFlow, 
+        estadoFlow, 
+        desafiliacionesFlow, 
+        fallecidoFlow, 
+        seleccionAuxFlow,
+        hospitalizacionFlow,
+        fallecimientoFlow,
+        calamidadFlow,
+        fallecimientoFamiliarFlow,
+        pazYSalvoFlow,
+        otrosFlow
     ])
 
     const adapterProvider = createProvider(Provider, {

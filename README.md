@@ -3,11 +3,10 @@
     <picture>
       <img src="https://builderbot.vercel.app/assets/thumbnail-vector.png" height="80">
     </picture>
-    <h2 align="center">BuilderBot</h2>
+    <h2 align="center">Builderbot based chatbot</h2>
   </a>
 </p>
 
-Builderbot based chatbot
 
 <p align="center">
   <a aria-label="NPM version" href="https://www.npmjs.com/package/@builderbot/bot">
